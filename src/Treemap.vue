@@ -20,7 +20,7 @@ type RectangleType = {
   height: string, 
   width: string, 
   backgroundColor: string,
-  border: string,
+  border?: string,
   position: string,
   display?: string
   name?: string,
@@ -52,48 +52,52 @@ let treemapData: Ref<TreemapDataInterface> = ref({
     rectangles: []
   })
 
-function treemap(data: DataInterface[], width: number, height: number, y: number = 0, x: number = 0): void {
+function treemap(
+  data: DataInterface[], 
+  width: number, 
+  height: number, 
+  color1: number, 
+  color2: number, 
+  color3: number,
+  declareSquer: boolean = true,
+  y: number = 0, 
+  x: number = 0, 
+  ): void {
+
   if (!data || data.length === 0) return;
-  // organiza o array
   data.sort((a, b) => b.value - a.value)
-  //soma os valores do array
   const sum: number = data.reduce((s, i) => s + i.value, 0);
-  // salva as coordenadas do espaço vazio
   const bounds: boundsInterface = { startTop: y, startLeft: x, right: width, bottom: height };
+
   // quanto falta dos valores 
   let weightLeft: number = sum;
   // declar os eixos e tamanhos do retangulo a ser gerado
   let eixoX: number, eixoY: number, rectangleWidth: number, rectangleHeigth: number;
 
-  // declara a cor inical retangulo
-  let color1: number = 0;
-  let color2: number = 170;
-  let color3: number = 0;
-
-  treemapData.value.squere = { 
+  if (declareSquer) {
+    treemapData.value.squere = { 
       top: `${bounds.startTop}px`, 
       left: `${bounds.startLeft}px`, 
       height: `${bounds.bottom}px`, 
-      width: `${bounds.right}px`, 
+      width: `${bounds.right}px`,
       backgroundColor: `white`,
-      border: '1px solid black',
       position: 'relative',
-  },
+    }
+  }
 
-  // itera pelo array de numeros e gera o retangulo
   data.forEach(el => {
     const horizontalVoidSpace: number = bounds.right - bounds.startLeft;
     const verticalVoidSpace: number = bounds.bottom - bounds.startTop;
-    // const area = el / unit;
+    
     eixoX = bounds.startLeft;
     eixoY = bounds.startTop;
+
     if (horizontalVoidSpace > verticalVoidSpace) {
-      // horizontalmente
       rectangleWidth = (el.value / weightLeft) * horizontalVoidSpace;
-      rectangleHeigth = verticalVoidSpace;
+      rectangleHeigth = verticalVoidSpace ;
       bounds.startLeft = eixoX + rectangleWidth;
+
     } else {
-      // verticalmente
       rectangleWidth = horizontalVoidSpace;
       rectangleHeigth = (el.value / weightLeft) * verticalVoidSpace;
       bounds.startTop = eixoY + rectangleHeigth;
@@ -113,19 +117,17 @@ function treemap(data: DataInterface[], width: number, height: number, y: number
       value: el.value
     })
 
-    color1+= 10;
-    color2+= 10;
-
+    color1+= 20;
+    color2+= 20;
+    
     if (el.children && el.children.length > 0) {
-        treemap(el.children, rectangleWidth, rectangleHeigth, eixoY, eixoX)
+        treemap(el.children, eixoX + rectangleWidth, eixoY + rectangleHeigth, color1 + 40, color2 + 40, color3, false, eixoY, eixoX)
     }
   });
-
-  console.log(treemapData.value)
 }
 
 onMounted(() => {
-  treemap(props.data, props.width, props.height)
+  treemap(props.data, props.width, props.height, 46, 163, 0)
 });
 
 </script>
