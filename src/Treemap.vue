@@ -25,6 +25,7 @@ type RectangleType = {
   display?: string
   name?: string,
   value?: number
+  fontSize?: string;
 };
 
 interface TreemapDataInterface {
@@ -50,7 +51,9 @@ let treemapData: Ref<TreemapDataInterface> = ref({
       position: 'relative',
     },
     rectangles: []
-  })
+ })
+
+const hoveredIndex = ref<number | null>(null);
 
 function treemap(
   data: DataInterface[], 
@@ -65,13 +68,12 @@ function treemap(
   ): void {
 
   if (!data || data.length === 0) return;
+
   data.sort((a, b) => b.value - a.value)
   const sum: number = data.reduce((s, i) => s + i.value, 0);
   const bounds: boundsInterface = { startTop: y, startLeft: x, right: width, bottom: height };
 
-  // quanto falta dos valores 
   let weightLeft: number = sum;
-  // declar os eixos e tamanhos do retangulo a ser gerado
   let eixoX: number, eixoY: number, rectangleWidth: number, rectangleHeigth: number;
 
   if (declareSquer) {
@@ -114,10 +116,10 @@ function treemap(
       backgroundColor: `rgb(${color1}, ${color2}, ${color3})`,
       border: '1px solid white',
       position: 'absolute',
-      value: el.value
+      value: el.value,
+      fontSize: `${(width + height) * 0.025}px`
     })
 
-    color1+= 20;
     color2+= 20;
     
     if (el.children && el.children.length > 0) {
@@ -127,41 +129,50 @@ function treemap(
 }
 
 onMounted(() => {
-  treemap(props.data, props.width, props.height, 46, 163, 0)
+  treemap(props.data, props.width, props.height, 0, 90, 0)
 });
 
 </script>
 
 <template>
-    <div style="height: 100vh; width: 100vw;">
-        <div :style="treemapData.squere">
-          <div 
-            v-for="rectangle in treemapData.rectangles" 
-            :style="{
-              ...rectangle, 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              overflow: 'hidden',
-              flexDirection: 'column'
-              }">
-              <span>{{ rectangle.name }}</span>
-              <span>{{ rectangle.value }}</span>
-          </div>
-        </div>
+  <div class="container2">
+    <h1>{{ props.title }}</h1>
+    <div :style="{...treemapData.squere, boxShadow: '15px 15px 5px rgba(0, 0, 0, 0.5)' }">
+      <div 
+        v-for="(rectangle, index) in treemapData.rectangles" 
+        :key="index"
+        :style="{
+          ...rectangle, 
+          padding: '5px',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          }"
+          @mouseover="hoveredIndex = index"
+          @mouseleave="hoveredIndex = null"
+        >
+          <span>{{ rectangle.name }}</span>
+          <span v-if="hoveredIndex === index">{{ rectangle.value }}</span>
+      </div>
     </div>
+  </div>
 </template>
 
 <style scoped>
 
-.rectangle {
-  display: flex;
-  text-align: center;
+.container2 {
+  margin-top: 10xp;
+  border: 1px solid black;
+  border-radius: 6px;
+  padding: 3%;
+  background-color:rgb(255, 251, 246);
+  box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.5);
+  height: auto;
+  width: auto;
 }
-
 
 span {
   color: rgb(255, 255, 255);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
-
 </style>

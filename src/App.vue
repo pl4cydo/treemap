@@ -70,17 +70,21 @@ const animalData: DataInterface[] = [
 
 <template>
   <main class="container">
-    <Treemap :data="data" title="Pernambucano" :width="500" :height="500"/>
-    <Treemap :data="animalData" title="Animaias" :width="1000" :height="1000"/>
+      <Treemap :data="data" title="Pernambucano" :width="500" :height="500"/>
+      <Treemap :data="animalData" title="Animaias" :width="1000" :height="1000"/>
   </main>
 </template>
 
 <style scoped>
 .container {
   width: 100vw;
-  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+}
+.feed {
+  width: 80%;
+  height: auto;
 }
 </style>
