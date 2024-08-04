@@ -2,7 +2,13 @@
 import Treemap, { DataInterface } from './Treemap.vue';
 
 const data: DataInterface[] = [
-  {name: "Sport", value: 300},
+  {name: "Sport", value: 300, 
+    children: [
+      {name: "Sport 1", value: 200}, 
+      {name: "Sport 2", value: 50}, 
+      {name: "Sport 3", value: 50}
+    ]
+  },
   {name: "Santa Cruz", value: 50},
   {name: "Náutico", value: 200},
   {name: "Porto", value: 150},
@@ -13,7 +19,7 @@ const data: DataInterface[] = [
 
 <template>
   <main class="container">
-    <Treemap :data="data" title="Pernambucano"/>
+    <Treemap :data="data" title="Pernambucano" :width="500" :height="500"/>
   </main>
 </template>
 

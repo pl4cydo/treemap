@@ -3,8 +3,16 @@ import { onMounted, ref, type Ref } from 'vue';
 
 export interface DataInterface {
   name: string,
-  value: number
+  value: number,
+  children?: DataInterface[]
 }
+
+const props = defineProps<{
+    data: DataInterface[],
+    title: string,
+    width: number,
+    height: number
+}>()
 
 type RectangleType = {
   top: string, 
@@ -31,11 +39,6 @@ interface boundsInterface {
   bottom: number 
 };
 
-const props = defineProps<{
-    data: { name: string, value: number }[],
-    title: string
-}>()
-
 let treemapData: Ref<TreemapDataInterface> = ref({
     squere: { 
       top: '0px', 
@@ -49,17 +52,14 @@ let treemapData: Ref<TreemapDataInterface> = ref({
     rectangles: []
   })
 
-function treemap(data: DataInterface[]): void {
+function treemap(data: DataInterface[], width: number, height: number, y: number = 0, x: number = 0): void {
+  if (!data || data.length === 0) return;
   // organiza o array
   data.sort((a, b) => b.value - a.value)
   //soma os valores do array
   const sum: number = data.reduce((s, i) => s + i.value, 0);
-  // declara o retangulo
-  const width: number = 500;
-  const height: number = 500;
   // salva as coordenadas do espaço vazio
-  const bounds: boundsInterface = { startTop: 0, startLeft: 0, right: width, bottom: height };
-
+  const bounds: boundsInterface = { startTop: y, startLeft: x, right: width, bottom: height };
   // quanto falta dos valores 
   let weightLeft: number = sum;
   // declar os eixos e tamanhos do retangulo a ser gerado
@@ -102,6 +102,7 @@ function treemap(data: DataInterface[]): void {
     weightLeft -= el.value;
 
     treemapData.value.rectangles.push({ 
+      name: el.name,
       top: `${eixoY}px`,
       left: `${eixoX}px`, 
       height: `${rectangleHeigth}px`, 
@@ -109,18 +110,22 @@ function treemap(data: DataInterface[]): void {
       backgroundColor: `rgb(${color1}, ${color2}, ${color3})`,
       border: '1px solid white',
       position: 'absolute',
-      name: el.name,
       value: el.value
     })
 
     color1+= 10;
     color2+= 10;
+
+    if (el.children && el.children.length > 0) {
+        treemap(el.children, rectangleWidth, rectangleHeigth, eixoY, eixoX)
+    }
   });
 
+  console.log(treemapData.value)
 }
 
 onMounted(() => {
-  treemap(props.data)
+  treemap(props.data, props.width, props.height)
 });
 
 </script>
