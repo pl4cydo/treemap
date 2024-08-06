@@ -117,7 +117,7 @@ function treemap(
       border: '1px solid white',
       position: 'absolute',
       value: el.value,
-      fontSize: `${(width + height) * 0.025}px`
+      fontSize: `${(rectangleWidth + rectangleHeigth) * 0.075}px`
     })
 
     color2+= 20;
